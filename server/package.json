@@ -2,5 +2,9 @@
   "name": "server",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^2.0.6",
+    "ts-node": "^9.1.1"
+  }
 }
