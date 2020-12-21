@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
+    "@types/express": "^4.17.9",
     "@types/node": "^14.14.14",
     "nodemon": "^2.0.6",
     "ts-node": "^9.1.1",
@@ -11,5 +12,8 @@
   },
   "scripts": {
     "dev": "nodemon -e ts --exec ts-node src"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
   }
 }
