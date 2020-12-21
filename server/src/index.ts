@@ -1,20 +1,47 @@
 import "graphql-import-node";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
-import typeDefs from "./typedefs.graphql";
-import resolvers from "./resolvers";
 import config from "../config.json";
-import http from 'http'
+import http from "http";
+import {PubSub} from 'apollo-server'
+import mongoose from "mongoose";
+import { SubscriptionServer } from "subscriptions-transport-ws";
+import { execute, subscribe } from "graphql";
+import schema from './schema'
 
-const app = express();
+mongoose
+  .connect(config.database, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  })
+  .then(() => {
+    const app = express();
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-});
+    app.use(express.json())
 
-server.applyMiddleware({ app, path: "/graphql" });
+    const server = new ApolloServer({
+      subscriptions: {
+          path: '/graphql'
+      },
+      schema
+    });
 
-const httpServer = http.createServer(app)
+    server.applyMiddleware({ app, path: "/graphql" });
 
-httpServer.listen({port: config.server.port}, () => console.log("Listening"));
+    const pubsub = new PubSub()
+
+    const httpServer = http.createServer(app);
+
+    httpServer.listen({ port: config.server.port }, () => {
+        new SubscriptionServer({
+            execute: execute,
+            subscribe: subscribe,
+            schema
+        }, {
+            server: httpServer,
+            path: '/graphql'
+        })
+      console.log("Listening")
+      console.log(server.subscriptionsPath)
+    });
+  });
